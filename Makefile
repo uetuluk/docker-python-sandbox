@@ -1,19 +1,11 @@
-compile-requirements:
-	pip-compile requirements.ini
-	pip-compile requirements.sandbox.ini
-
-requirements:
-	pip install -r requirements.txt
-	pip install -r requirements.sandbox.txt
-
-develop:
-	uvicorn main:app --reload
-
-production:
-	uvicorn main:app
-
-build-image:
+build-production-image:
 	docker build -t docker-python-sandbox .
 
-run-image:
+build-development-image:
+	docker build -t docker-python-sandbox-development --target=development .
+
+production:
 	docker run --rm -p 3000:3000 docker-python-sandbox
+
+development:
+	docker run --rm -it -v $(PWD):/app -p 3000:3000 docker-python-sandbox-development 

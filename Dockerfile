@@ -17,6 +17,12 @@ RUN --mount=type=cache,target=/root/.cache \
 
 COPY . /app
 
+FROM base as development
+
+EXPOSE 3000
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "3000"]
+
+FROM base as default
 EXPOSE 3000
 
 CMD ["uvicorn", "main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "3000"]
