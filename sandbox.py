@@ -5,24 +5,49 @@
 # from RestrictedPython import utility_builtins
 import sys
 from io import StringIO
+import traceback
+import ast
+
+
+class CodeExecutor:
+    def __init__(self):
+        self.locals = {}
+
+    def execute_code(self, code_string: str) -> str:
+        output = StringIO()
+        code = ast.parse(code_string, mode='exec')
+
+        try:
+            sys.stdout = output
+            for node in code.body:
+                if isinstance(node, ast.Expr):  # an expression, to be evaluated
+                    result = eval(compile(ast.Expression(
+                        node.value), '<string>', 'eval'), self.locals)
+                    if result is not None:
+                        print(result)
+                else:  # a statement, to be executed
+                    exec(compile(ast.fix_missing_locations(ast.Module(
+                        [node], [])), '<string>', 'exec'), self.locals)
+
+        except:
+            return traceback.format_exc()
+        finally:
+            sys.stdout = sys.__stdout__
+
+        return output.getvalue()
+
+
+code_executor = CodeExecutor()
 
 
 def run(code_string: str) -> str:
-    try:
-        # byte_code = compile(code_string, '<inline code>', 'exec')
-        # exec(byte_code, {'__builtins__': safe_builtins}, None)
-        stdout_backup = sys.stdout
-        sys.stdout = StringIO()
+    # byte_code = compile(code_string, '<inline code>', 'exec')
+    # exec(byte_code, {'__builtins__': safe_builtins}, None)
+    print(code_string)
 
-        exec(code_string, None)
+    code_executor_result = code_executor.execute_code(code_string)
 
-        console_output = sys.stdout.getvalue()
-        sys.stdout = stdout_backup
+    if code_executor_result:
+        return code_executor_result
 
-        if console_output:
-            return console_output
-
-        return "Code executed successfully."
-
-    except Exception as error:
-        print(error)
+    return "Code executed successfully."
