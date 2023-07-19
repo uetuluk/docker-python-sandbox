@@ -8,4 +8,4 @@ production:
 	docker run --rm -p 3000:3000 docker-python-sandbox
 
 development:
-	docker run --rm -it -v $(PWD):/app -p 3000:3000 docker-python-sandbox-development 
+	docker run --rm -it -v $(PWD):/app -v $(PWD)/data:/mnt/data -p 3000:3000 docker-python-sandbox-development 
