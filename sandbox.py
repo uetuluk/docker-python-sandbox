@@ -4,14 +4,38 @@
 # from RestrictedPython import limited_builtins
 # from RestrictedPython import utility_builtins
 import sys
-from io import StringIO
+from io import StringIO, BytesIO
 import traceback
 import ast
+import matplotlib.pyplot as plt
+import base64
+import builtins
+import importlib
 
 
 class CodeExecutor:
     def __init__(self):
         self.locals = {}
+        self.original_import = builtins.__import__
+
+        # Handle matplotlib plots
+
+        def custom_show(original_show):
+            def show(*args, **kwargs):
+                buf = BytesIO()
+                plt.savefig(buf, format='png')
+                buf.seek(0)
+                print(base64.b64encode(buf.read()).decode('utf-8'))
+                return original_show(*args, **kwargs)
+            return show
+
+        def custom_import(name, *args, **kwargs):
+            module = self.original_import(name, *args, **kwargs)
+            if "matplotlib.pyplot" in name:
+                module.pyplot.show = custom_show(module.pyplot.show)
+            return module
+
+        builtins.__import__ = custom_import
 
     def execute_code(self, code_string: str) -> str:
         output = StringIO()
@@ -28,12 +52,13 @@ class CodeExecutor:
                 else:  # a statement, to be executed
                     exec(compile(ast.fix_missing_locations(ast.Module(
                         [node], [])), '<string>', 'exec'), self.locals)
+            plt.close('all')
 
         except:
             return traceback.format_exc()
         finally:
             sys.stdout = sys.__stdout__
-
+        # print(self.locals)
         return output.getvalue()
 
 
