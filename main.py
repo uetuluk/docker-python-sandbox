@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sandbox import run
 
@@ -21,3 +22,8 @@ async def sandbox_run(code: Code):
     code = jsonable_encoder(code)
     code_string = code.get("code_string")
     return run(code_string)
+
+
+@app.get("/healthz")
+async def health_check():
+    return JSONResponse({"status": "ok"})
