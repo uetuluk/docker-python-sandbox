@@ -232,7 +232,7 @@ httpcore==0.17.3
 html5lib==1.1
 hpack==4.0.0
 h11==0.14.0
-h5py==3.6.0
+h5py==3.7.0
 h5netcdf==1.1.0
 h2==4.1.0
 gTTS==2.2.3
@@ -305,8 +305,6 @@ blinker==1.6.2
 bleach==6.0.0
 beautifulsoup4==4.8.2
 bcrypt==4.0.1
-basemap==1.3.2
-basemap-data==1.3.2
 backoff==1.10.0
 backcall==0.2.0
 Babel==2.12.1
